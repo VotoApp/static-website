@@ -20,7 +20,7 @@
   "scripts": {
     "start": "react-scripts start",
     "build": "react-scripts build",
-    "publish": "react-scripts build && gh-pages -d build",
+    "publish": "react-scripts build && echo web.voto.mpbell.dev > ./build/CNAME && gh-pages -d build",
     "test": "react-scripts test",
     "eject": "react-scripts eject"
   },
