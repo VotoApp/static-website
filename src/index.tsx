@@ -408,7 +408,7 @@ var styles: { [key: string]: CSSProperties } = {
     display: 'flex',
     flexDirection: 'column',
     justifyContent: 'flex-end',
-    height: '100vh',
+    height: "100%",
     alignItems: 'center',
   },
   middleModalOuterContainer: {

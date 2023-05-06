@@ -18,6 +18,13 @@
     }
 }
 
+:root {
+    height: 100%;
+}
+
+#root {
+    height: 100%;
+}
 
 body {
     box-sizing: border-box;
