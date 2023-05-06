@@ -1,15 +1,12 @@
-import React, { useCallback, useEffect, useRef, useState } from 'react';
+import React, { CSSProperties, useCallback, useEffect, useRef, useState } from 'react';
 import ReactDOM from 'react-dom/client';
 import './index.css'
 import { ZIndices } from './ZIndices';
 import { localized_strings } from './strings';
-import { numbers } from './numbers';
-import { constants } from './constants';
 import { ChangeEventHandler } from 'react';
 import retryify from 'fetch-retry'
 
 const fetchWithRetries = retryify(fetch);
-
 
 const root = ReactDOM.createRoot(
   document.getElementById('root') as HTMLElement
@@ -42,17 +39,6 @@ type EnumDictionary<T extends string | symbol | number, U> = {
   [K in T]: U;
 };
 
-interface WaitlistContainerProps {
-  children: React.ReactNode
-}
-
-function WaitlistContainer({ children }: WaitlistContainerProps) {
-  return <div>{children}</div>
-}
-
-
-
-
 enum SignUpState {
   HOME,
   FORM,
@@ -62,26 +48,12 @@ enum SignUpState {
 
 function TitleBanner() {
   return (
-    <div style={{
-      display: "flex",
-      alignSelf: 'center',
-      flexDirection: 'column',
-      userSelect: 'none',
-    }}>
+    <div style={styles.titleBannerContainer}>
       <p style={{
-        color: "white",
-        margin: 0,
-        fontStyle: "italic",
-        fontWeight: 400,
-        fontSize: 25,
-        marginBottom: -30,
+        ...styles.subtitleText, ...styles.titleBannerSubtitle
       }}
       >{localized_strings.welcomeTo}</p>
-      <p style={{
-        color: "white",
-        margin: 0,
-        fontSize: 128,
-      }}
+      <p style={styles.titleText}
       >{localized_strings.VotoTitle}</p>
     </div>
 
@@ -90,26 +62,14 @@ function TitleBanner() {
 
 
 
-const ctaButtonSize = {
-  "m": {
-    fontSize: 30,
-    height: 60,
-  },
-  "s": {
-    fontSize: 30,
-    height: 40,
-  }
-}
-
 interface CtaButtonProps {
   title: string
-  size: keyof typeof ctaButtonSize
   disabled?: boolean;
   isLoading?: boolean;
   onPress: () => void,
 }
 
-function CtaButton({ title, size, onPress, disabled, isLoading }: CtaButtonProps) {
+function CtaButton({ title, onPress, disabled, isLoading }: CtaButtonProps) {
 
   const [isHovering, setIsHovering] = useState(false)
   const [scale, setScale] = useState(1)
@@ -143,7 +103,6 @@ function CtaButton({ title, size, onPress, disabled, isLoading }: CtaButtonProps
     setOpacity(0.8)
     onPress()
   }, [onPress, disabled])
-  const { fontSize, height } = ctaButtonSize[size]
 
   return (
     <button
@@ -152,18 +111,10 @@ function CtaButton({ title, size, onPress, disabled, isLoading }: CtaButtonProps
       onMouseEnter={onMouseEnter}
       onMouseLeave={onMouseLeave}
       style={{
-        margin: 0,
-        backgroundColor: 'white',
+        ...styles.ctaButton,
         transform: `scale(${scale})`,
         opacity: disabled ? 0.8 : opacity,
         cursor: disabled ? 'default' : 'pointer',
-        fontSize,
-        height,
-        color: 'black',
-        border: 0,
-        fontFamily: constants.fontFamily,
-        width: '100%',
-        borderRadius: numbers.CTA_BUTTON_BORDER_RADIUS,
       }}
     >{isLoading ? <SpinnerCicle /> : title}
     </button>
@@ -171,33 +122,21 @@ function CtaButton({ title, size, onPress, disabled, isLoading }: CtaButtonProps
 
 }
 
+
 interface ExplainerTextProps {
   text: string
 }
 function ExplainerText({ text }: ExplainerTextProps) {
-  return <p style={{
-    fontSize: 25,
-    userSelect: 'none',
-    color: 'white',
-  }}
-  >{text}</p>
+  return <p style={styles.explainerText} >{text}</p>
 }
-
 
 
 export function Home({ onNext }: PageProp) {
   return (
-    <div style={{
-      height: '70%',
-      display: 'flex',
-      flexDirection: 'column',
-      justifyContent: 'space-between',
-      minWidth: 340,
-      marginBottom: 80,
-    }}>
+    <div style={styles.homePageContainer}>
       <TitleBanner />
       <ExplainerText text={localized_strings.explainer} />
-      <CtaButton onPress={onNext} size='m' title={localized_strings.waitlistCta} />
+      <CtaButton onPress={onNext} title={localized_strings.waitlistCta} />
     </div>
   )
 }
@@ -243,52 +182,26 @@ function EmailInputGroup({ setIsEmailValid, setEmailInput: setParentEmailInput }
   }, [emailStatus])
 
 
-  return (<div style={{ display: 'flex', flexDirection: 'column', gap: 30 }}>
-    <p
-      style={{
-        color: 'white',
-        fontSize: 25,
-        margin: 0,
-      }}
-    >{localized_strings.emailAsk}</p>
-    <div style={{
-      display: 'flex',
-      flexDirection: 'row'
-    }}>
+  return (<div style={{ ...styles.columnContainer, gap: '0.05rem' }}>
+    <p style={styles.mediumRegularText} >{localized_strings.emailAsk}</p>
+    <div style={styles.rowContainer}>
       <input
         spellCheck={false}
         onChange={onChange}
         autoComplete='email'
         placeholder={localized_strings.emailPlaceholder}
-        style={{
-          outline: 0,
-          border: 0,
-          color: 'white',
-          borderRadius: numbers.CTA_BUTTON_BORDER_RADIUS,
-          fontFamily: constants.fontFamily,
-          paddingLeft: 10,
-          paddingRight: 10,
-          width: '20%',
-          flex: 1,
-          paddingTop: 5,
-          paddingBottom: 5,
-          fontSize: 24,
-          backgroundColor: 'rgba(255,255,255,0.25)'
-        }}
+        style={{ ...styles.textInput, alignSelf: 'center' }}
         type='email' />
       <StatusIndicator status={emailStatus} />
     </div>
   </div>)
 }
 
+
+
+
 function WaitlistSignupTitle() {
-  return (<p style={{
-    fontSize: 45,
-    userSelect: 'none',
-    margin: 0,
-    color: 'white'
-  }}
-  >{localized_strings.waitlistSignupTitle}</p>)
+  return (<p style={styles.containerTitle} >{localized_strings.waitlistSignupTitle}</p>)
 }
 
 
@@ -375,68 +288,31 @@ function WaitlistForm({ onNext }: PageProp) {
   }, [isNextDisabled])
 
   return (
-    <div style={{
-      // height: '50%',
-      display: 'flex',
-      flexDirection: 'column',
-      justifyContent: 'space-between',
-      width: 400,
-      marginTop: 'auto',
-      marginBottom: 'auto',
-    }}>
+    <div style={styles.middleModalOuterContainer}>
       <WaitlistSignupTitle />
       <div style={{
-        padding: 40,
-        display: 'flex',
-        flexDirection: 'column',
-        justifyContent: 'space-between',
-        height: '100%',
-        marginTop: 20,
-        backgroundColor: 'rgba(60,60,60,0.2)',
-        borderRadius: numbers.CTA_BUTTON_BORDER_RADIUS,
+        ...styles.middleModalInnerContainer,
         gap: 30
       }}>
 
         <EmailInputGroup setIsEmailValid={setIsEmailValid} setEmailInput={setEmailInput} />
-        <CtaButton isLoading={isLoading} onPress={onPress} size='s' title={localized_strings.signUpCta} disabled={isNextDisabled} />
+        <CtaButton isLoading={isLoading} onPress={onPress} title={localized_strings.signUpCta} disabled={isNextDisabled} />
       </div>
     </div>
   )
 }
 
+
 function WaitlistThanks({ onNext }: PageProp) {
   return (
-    <div style={{
-      display: 'flex',
-      flexDirection: 'column',
-      justifyContent: 'space-between',
-      width: 400,
-      marginTop: 'auto',
-      marginBottom: 'auto',
-    }}>
+    <div style={styles.middleModalOuterContainer}>
       <WaitlistSignupTitle />
-      <div style={{
-        padding: 40,
-        display: 'flex',
-        gap: 40,
-        marginTop: 20,
-        flexDirection: 'column',
-        justifyContent: 'space-between',
-        height: '100%',
-        backgroundColor: 'rgba(60,60,60,0.2)',
-        borderRadius: numbers.CTA_BUTTON_BORDER_RADIUS,
-      }}>
+      <div style={{ ...styles.middleModalInnerContainer, gap: 40, }}>
 
         <p
-          style={{
-            alignSelf: 'center',
-            color: 'white',
-            fontSize: 30,
-            fontStyle: 'italic',
-            margin: 0,
-          }}
+          style={{ alignSelf: 'center', ...styles.mediumItalicText }}
         >{localized_strings.thanks}</p>
-        <CtaButton onPress={onNext} size='s' title={localized_strings.backHomeCta} />
+        <CtaButton onPress={onNext} title={localized_strings.backHomeCta} />
       </div>
     </div>
   )
@@ -466,13 +342,7 @@ function App() {
     setSignupState(nextStateMapper[signUpState])
   }, [signUpState])
   return (
-    <div style={{
-      display: 'flex',
-      flexDirection: 'column',
-      justifyContent: 'flex-end',
-      height: '100vh',
-      alignItems: 'center',
-    }}>
+    <div style={styles.appContainer}>
       <DisplayComponent onNext={onNext} />
       <BackgroundFill />
     </div >)
@@ -480,22 +350,29 @@ function App() {
 
 function BackgroundFill() {
   return (
-    <svg style={{
-      zIndex: ZIndices.BackgroundFill,
-      position: 'absolute',
-      left: 0,
-      right: 0,
-      bottom: 0,
-      top: 0,
-    }} viewBox="0 0 1512 982" fill="none" xmlns="http://www.w3.org/2000/svg">
-      <rect width="1512" height="982" fill="url(#paint0_linear_9_3)" />
-      <defs>
-        <linearGradient id="paint0_linear_9_3" x1="1136" y1="-112.5" x2="90" y2="803.5" gradientUnits="userSpaceOnUse">
-          <stop offset="0.0870987" stopColor="#150B1D" />
-          <stop offset="1" />
-        </linearGradient>
-      </defs>
-    </svg>
+    <div
+      style={{
+        ...styles.absoluteFill,
+        zIndex: ZIndices.BackgroundFill,
+      }}
+    >
+      <svg
+
+        width="100%"
+        height="100%"
+        style={{
+          position: 'absolute'
+        }} fill="none" xmlns="http://www.w3.org/2000/svg"
+      >
+        <rect width="100%" height="100%" fill="url(#paint0_linear_9_3)" />
+        <defs>
+          <linearGradient id="paint0_linear_9_3" x1="1136" y1="-112.5" x2="90" y2="803.5" gradientUnits="userSpaceOnUse">
+            <stop offset="0.0870987" stopColor="#150B1D" />
+            <stop offset="1" />
+          </linearGradient>
+        </defs>
+      </svg>
+    </div>
   )
 }
 
@@ -504,3 +381,131 @@ root.render(
     <App />
   </React.StrictMode>
 );
+
+
+var stylesShared = {
+  borderRadius: 5,
+  fontFamily: "Crimson Pro"
+}
+
+var styles: { [key: string]: CSSProperties } = {
+  columnContainer: {
+    display: 'flex',
+    flexDirection: 'column'
+  },
+  rowContainer: {
+    display: 'flex',
+    flexDirection: 'row'
+  },
+  absoluteFill: {
+    position: 'absolute',
+    left: 0,
+    right: 0,
+    bottom: 0,
+    top: 0,
+  },
+  appContainer: {
+    display: 'flex',
+    flexDirection: 'column',
+    justifyContent: 'flex-end',
+    height: '100vh',
+    alignItems: 'center',
+  },
+  middleModalOuterContainer: {
+    display: 'flex',
+    flexDirection: 'column',
+    justifyContent: 'space-between',
+    width: '100%',
+    maxWidth: "0.8rem",
+    marginTop: 'auto',
+    marginBottom: 'auto',
+
+  },
+  middleModalInnerContainer: {
+    padding: '0.04rem',
+    display: 'flex',
+    flexDirection: 'column',
+    justifyContent: 'space-between',
+    height: '100%',
+    marginTop: 20,
+    backgroundColor: 'rgba(60,60,60,0.2)',
+    borderRadius: stylesShared.borderRadius,
+  },
+  titleBannerContainer: {
+    display: "flex",
+    alignSelf: 'center',
+    flexDirection: 'column',
+    userSelect: 'none',
+  },
+  titleBannerSubtitle: {
+    marginBottom: "-1em",
+  },
+  homePageContainer: {
+    height: '70%',
+    display: 'flex',
+    flexDirection: 'column',
+    justifyContent: 'space-between',
+    marginLeft: 10,
+    marginRight: 10,
+    marginBottom: "0.08rem",
+  },
+  containerTitle: {
+    fontSize: '0.08rem',
+    userSelect: 'none',
+    margin: 0,
+    color: 'white'
+  },
+  explainerText: {
+    fontSize: '0.05rem',
+    userSelect: 'none',
+    color: 'white',
+  },
+  mediumRegularText: {
+    color: 'white',
+    fontSize: '0.05rem',
+    margin: 0,
+  },
+  mediumItalicText: {
+    color: 'white',
+    fontSize: '0.05rem',
+    fontStyle: 'italic',
+    margin: 0,
+  },
+  textInput: {
+    outline: 0,
+    border: 0,
+    color: 'white',
+    borderRadius: stylesShared.borderRadius,
+    fontFamily: stylesShared.fontFamily,
+    height: "0.08rem",
+    width: '20%',
+    flex: 1,
+    paddingLeft: '0.02rem',
+    paddingRight: '0.02rem',
+    fontSize: '0.05rem',
+    backgroundColor: 'rgba(255,255,255,0.25)'
+  },
+  subtitleText: {
+    color: "white",
+    margin: 0,
+    fontStyle: "italic",
+    fontWeight: 400,
+    fontSize: '0.05rem',
+  },
+  titleText: {
+    color: "white",
+    margin: 0,
+    fontSize: "0.2rem",
+  },
+  ctaButton: {
+    margin: 0,
+    color: 'black',
+    fontSize: '0.05rem',
+    height: '0.08rem',
+    backgroundColor: 'white',
+    fontFamily: stylesShared.fontFamily,
+    border: 0,
+    width: '100%',
+    borderRadius: stylesShared.borderRadius,
+  },
+}

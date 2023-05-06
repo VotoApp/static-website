@@ -1,5 +1,24 @@
 @import url('https://fonts.googleapis.com/css2?family=Crimson+Pro:ital,wght@0,200;0,400;0,700;1,400&display=swap');
 
+@media screen and (min-width: 600px) {
+    :root {
+        font-size: 600px;
+    }
+}
+
+@media screen and (max-width: 600px) and (min-width: 400px) {
+    :root {
+        font-size: 100vw;
+    }
+}
+
+@media screen and (max-width: 400px) {
+    :root {
+        font-size: 400px;
+    }
+}
+
+
 body {
     box-sizing: border-box;
     margin: 0;
